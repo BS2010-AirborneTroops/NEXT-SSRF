@@ -5,10 +5,10 @@ SSRF — CVE-2026-44578 Scanner &amp; Exploit ║ ║ Next.js WebSocket Upgrade 
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
-║         NextSSRF — CVE-2026-44578 Scanner & Exploit                     ║
-║   Next.js WebSocket Upgrade Handler SSRF                                ║
-║   Affected: 13.4.13 → 15.5.15, 16.0.0 → 16.2.4                         ║
-║         @boneksiber/cybergang persebaya — Bug Bounty Tooling            ║
+║               NextSSRF — CVE-2026-44578 Scanner & Exploit               ║
+║                 Next.js WebSocket Upgrade Handler SSRF                  ║
+║             Affected: 13.4.13 → 15.5.15, 16.0.0 → 16.2.4               ║
+║           @boneksiber/cybergang persebaya — Bug Bounty Tooling          ║
 ╚══════════════════════════════════════════════════════════════╝
 ```
 
