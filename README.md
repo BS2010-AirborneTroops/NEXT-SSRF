@@ -70,14 +70,6 @@ The `//` in `http://` triggers `normalizeRepeatedSlashes` early-exit, setting `s
 
 ---
 
-## Demo
-
-![NextSSRF — AWS Credentials Exfiltrated](nextssrf.jpg)
-
-> AWS IMDSv1 credentials exfiltrated via CVE-2026-44578 — interactive exploit shell
-
----
-
 ## Install
 
 ```bash
