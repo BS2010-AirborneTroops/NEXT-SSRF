@@ -4,12 +4,12 @@ SSRF — CVE-2026-44578 Scanner &amp; Exploit ║ ║ Next.js WebSocket Upgrade 
 <div align="center">
 
 ```
-╔══════════════════════════════════════════════════════════════╗
-║               NextSSRF — CVE-2026-44578 Scanner & Exploit               ║
-║                 Next.js WebSocket Upgrade Handler SSRF                  ║
-║             Affected: 13.4.13 → 15.5.15, 16.0.0 → 16.2.4               ║
-║           @boneksiber/cybergang persebaya — Bug Bounty Tooling          ║
-╚══════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════╗
+║       NextSSRF — CVE-2026-44578 Scanner & Exploit          ║
+║         Next.js WebSocket Upgrade Handler SSRF             ║
+║      Affected: 13.4.13 → 15.5.15, 16.0.0 → 16.2.4         ║
+║    @boneksiber/cybergang persebaya — Bug Bounty Tooling    ║
+╚═══════════════════════════════════════════════════╝
 ```
 
 ![Python](https://img.shields.io/badge/python-3.10+-blue?style=flat-square&logo=python)
@@ -58,7 +58,7 @@ The `//` in `http://` triggers `normalizeRepeatedSlashes` early-exit, setting `s
 |-----------------|--------------------|----------|
 | Next.js         | 13.4.13 – 15.5.15  | 15.5.16  |
 | Next.js         | 16.0.0 – 16.2.4    | 16.2.5   |
-| Vercel-hosted   | ✅ NOT affected     | N/A      |
+| Vercel-hosted   | ✅ NOT affected     | N/A     |
 
 ### Limitations
 
@@ -137,11 +137,11 @@ python3 cvesiber2026.py -t https://target.com
 ```
 
 ```
-╔══════════════════════════════════════════════════╗
-║  NextSSRF v2 — Interactive Exploit Shell         ║
+╔═════════════════════════════════════════╗
+║  NextSSRF v2 — Interactive Exploit Shell        ║
 ║  Target : ec2-x-x-x-x.compute.amazonaws.com     ║
-║  CVE    : CVE-2026-44578  |  Status: Connected   ║
-╚══════════════════════════════════════════════════╝
+║  CVE    : CVE-2026-44578  |  Status: Connected  ║
+╚═════════════════════════════════════════╝
 
 nextssrf(ec2-x...)> cloud
   [>] Detecting cloud provider...
